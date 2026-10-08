@@ -3,16 +3,19 @@ name: Verify pinned Erdos proofs
 on:
   workflow_dispatch:
 
+env:
+  PINNED_COMMIT: 8822f7ddef30fadbd92e1c6ab4ed897af356af5e
+
 jobs:
-  verify:
+  erdos449:
+    name: Erdos449.not_erdos_449
     runs-on: ubuntu-latest
-    timeout-minutes: 300
+    timeout-minutes: 120
     defaults:
       run:
         working-directory: src/latest
     steps:
-      - name: Check out plby/lean-proofs at the pinned commit
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           repository: plby/lean-proofs
           ref: 8822f7ddef30fadbd92e1c6ab4ed897af356af5e
@@ -23,24 +26,65 @@ jobs:
           curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
 
-      - name: Show toolchain
-        run: lean --version
+      - run: lean --version
+      - run: lake exe cache get
+      - run: lake build ErdosProblems.Erdos449
 
-      - name: Fetch the Mathlib cache
-        run: lake exe cache get
-
-      - name: Build ErdosProblems.Erdos446
-        run: lake build ErdosProblems.Erdos446
-
-      - name: Axiom closure of Erdos446.erdos_446
-        run: |
-          printf 'import ErdosProblems.Erdos446\n#print axioms Erdos446.erdos_446\n' > axioms_446.lean
-          lake env lean axioms_446.lean
-
-      - name: Build ErdosProblems.Erdos449
-        run: lake build ErdosProblems.Erdos449
-
-      - name: Axiom closure of Erdos449.not_erdos_449
+      - name: Axiom closure
         run: |
           printf 'import ErdosProblems.Erdos449\n#print axioms Erdos449.not_erdos_449\n' > axioms_449.lean
           lake env lean axioms_449.lean
+
+  erdos446:
+    name: Erdos446.erdos_446
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    defaults:
+      run:
+        working-directory: src/latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          repository: plby/lean-proofs
+          ref: 8822f7ddef30fadbd92e1c6ab4ed897af356af5e
+
+      - name: Install elan
+        working-directory: .
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - run: lean --version
+      - run: lake exe cache get
+
+      # Replicates the `post_update` hook of src/latest/lakefile.lean, which
+      # `lake build` does not run. Without it the dependencies do not compile.
+      - name: Apply the upstream compatibility patches
+        run: |
+          set -eu
+          apply() {
+            pkg=".lake/packages/$1"; patch="patches/$2"
+            if git -C "$pkg" apply --check "$PWD/$patch" 2>/dev/null; then
+              git -C "$pkg" apply "$PWD/$patch" && echo "applied $2 to $1"
+            elif git -C "$pkg" apply --reverse --check "$PWD/$patch" 2>/dev/null; then
+              echo "already applied: $2"
+            else
+              echo "CANNOT APPLY $2 to $1"; exit 1
+            fi
+          }
+          apply BoundedGaps formalpantheon-v4.33.0.patch
+          apply BoundedGaps formalpantheon-v4.33.0-s2.patch
+          apply BoundedGaps boundedgaps-linter-v4.33.0.patch
+          apply AINTLIB     aintlib-v4.33.0.patch
+          apply AINTLIB     hasseweil-linter-v4.33.0.patch
+          apply AINTLIB     chebotarev-linter-v4.33.0.patch
+          apply AINTLIB     dedekind-flt-linter-v4.33.0.patch
+          apply leancert    leancert-linter-v4.33.0.patch
+          apply Waring      waring-linter-v4.33.0.patch
+
+      - run: lake build ErdosProblems.Erdos446
+
+      - name: Axiom closure
+        run: |
+          printf 'import ErdosProblems.Erdos446\n#print axioms Erdos446.erdos_446\n' > axioms_446.lean
+          lake env lean axioms_446.lean

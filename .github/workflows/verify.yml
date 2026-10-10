@@ -88,3 +88,38 @@ jobs:
         run: |
           printf 'import ErdosProblems.Erdos446\n#print axioms Erdos446.erdos_446\n' > axioms_446.lean
           lake env lean axioms_446.lean
+
+  bridge449:
+    name: Statement bridge for Erdos449
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Check out this repository
+        uses: actions/checkout@v5
+        with:
+          path: self
+
+      - name: Check out plby/lean-proofs at the pinned commit
+        uses: actions/checkout@v5
+        with:
+          repository: plby/lean-proofs
+          ref: 8822f7ddef30fadbd92e1c6ab4ed897af356af5e
+          path: upstream
+
+      - name: Install elan
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Build the pinned proof
+        working-directory: upstream/src/latest
+        run: |
+          lean --version
+          lake exe cache get
+          lake build ErdosProblems.Erdos449
+
+      - name: Check the statement bridge
+        working-directory: upstream/src/latest
+        run: |
+          cp "$GITHUB_WORKSPACE/self/bridge/Bridge449.lean" .
+          lake env lean Bridge449.lean

@@ -1,7 +1,12 @@
 {
   "challenge_module": "Challenge",
   "solution_module": "Solution",
-  "theorem_names": ["Erdos449.not_erdos_449"],
-  "permitted_axioms": ["propext", "Classical.choice", "Quot.sound"],
-  "enable_nanoda": true
+  "theorem_names": [
+    "Erdos449.not_erdos_449"
+  ],
+  "permitted_axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+  ]
 }

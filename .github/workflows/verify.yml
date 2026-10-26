@@ -163,10 +163,22 @@ jobs:
         run: lake build Deps Challenge ChallengeFC Solution
 
       - name: Comparator — against the challenge distributed with the proof
-        run: lake comparator --config comparator.json 2>&1 | tee comparator-plby.log
+        run: |
+          set -o pipefail
+          lake comparator --config comparator.json 2>&1 | tee comparator-plby.log
+          echo "verdict plby : $?"
 
       - name: Comparator — against the statement of formal-conjectures#5210
-        run: lake comparator --config comparator-fc.json 2>&1 | tee comparator-fc.log
+        run: |
+          set -o pipefail
+          lake comparator --config comparator-fc.json 2>&1 | tee comparator-fc.log
+          echo "verdict formal-conjectures : $?"
+
+      - name: Comparator — same statement, every bundled external kernel
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          lake comparator --config comparator-fc.json --paranoid 2>&1 | tee comparator-fc-paranoid.log
 
       - name: Upload logs
         if: always()

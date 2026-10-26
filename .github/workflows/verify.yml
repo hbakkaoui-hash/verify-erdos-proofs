@@ -160,7 +160,7 @@ jobs:
           lake exe cache get
 
       - name: Build challenge and solution
-        run: lake build Challenge ChallengeFC Solution
+        run: lake build Deps Challenge ChallengeFC Solution
 
       - name: Comparator — against the challenge distributed with the proof
         run: lake comparator --config comparator.json 2>&1 | tee comparator-plby.log

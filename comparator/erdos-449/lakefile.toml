@@ -10,7 +10,13 @@ rev = "065356127b1dc0016f66b7283ce0ce2c4055aa55"
 # Les modules de plby, recopies tels quels par fetch.sh au commit epingle.
 [[lean_lib]]
 name = "Deps"
-roots = ["ErdosProblems.Erdos449"]
+roots = [
+  "Util.Density",
+  "ErdosProblems.Erdos446.Basic",
+  "ErdosProblems.Erdos448.Basic",
+  "ErdosProblems.Erdos448.Prop2Scale448",
+  "ErdosProblems.Erdos449",
+]
 
 # Le defi distribue par plby avec sa preuve.
 [[lean_lib]]

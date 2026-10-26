@@ -1,0 +1,27 @@
+name = "Erdos449Comparator"
+version = "0.1.0"
+defaultTargets = ["Challenge", "ChallengeFC", "Solution"]
+
+[[require]]
+name = "mathlib"
+git = "https://github.com/leanprover-community/mathlib4.git"
+rev = "065356127b1dc0016f66b7283ce0ce2c4055aa55"
+
+# Les modules de plby, recopies tels quels par fetch.sh au commit epingle.
+[[lean_lib]]
+name = "Deps"
+roots = ["ErdosProblems.Erdos449"]
+
+# Le defi distribue par plby avec sa preuve.
+[[lean_lib]]
+name = "Challenge"
+roots = ["Challenge"]
+
+# L'enonce de la pull request formal-conjectures#5210.
+[[lean_lib]]
+name = "ChallengeFC"
+roots = ["ChallengeFC"]
+
+[[lean_lib]]
+name = "Solution"
+roots = ["Solution"]

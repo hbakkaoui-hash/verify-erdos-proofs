@@ -123,3 +123,55 @@ jobs:
         run: |
           cp "$GITHUB_WORKSPACE/self/bridge/Bridge449.lean" .
           lake env lean Bridge449.lean
+
+  comparator449:
+    name: Comparator — Erdos449
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    defaults:
+      run:
+        working-directory: comparator/erdos-449
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install bubblewrap (required by lake comparator)
+        working-directory: .
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends bubblewrap jq
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0 || true
+          bwrap --version
+
+      - name: Install elan
+        working-directory: .
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Fetch the pinned proof and its challenge
+        run: bash fetch.sh
+
+      - run: lean --version
+      - run: lake --help | grep -A1 comparator || true
+
+      - name: Resolve dependencies and fetch the Mathlib cache
+        run: |
+          lake update -R 2>&1 | tail -5
+          lake exe cache get
+
+      - name: Build challenge and solution
+        run: lake build Challenge ChallengeFC Solution
+
+      - name: Comparator — against the challenge distributed with the proof
+        run: lake comparator --config comparator.json 2>&1 | tee comparator-plby.log
+
+      - name: Comparator — against the statement of formal-conjectures#5210
+        run: lake comparator --config comparator-fc.json 2>&1 | tee comparator-fc.log
+
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: comparator-449-logs
+          path: comparator/erdos-449/*.log
+          if-no-files-found: ignore

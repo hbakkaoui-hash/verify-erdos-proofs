@@ -160,7 +160,7 @@ jobs:
           lake exe cache get
 
       - name: Build challenge and solution
-        run: lake build Deps Challenge ChallengeFC Solution
+        run: lake build Deps Challenge ChallengeFC Solution SolutionFC
 
       - name: Comparator — against the challenge distributed with the proof
         run: |

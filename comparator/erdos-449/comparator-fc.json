@@ -1,12 +1,6 @@
 {
   "challenge_module": "ChallengeFC",
-  "solution_module": "Solution",
-  "theorem_names": [
-    "Erdos449.not_erdos_449"
-  ],
-  "permitted_axioms": [
-    "propext",
-    "Classical.choice",
-    "Quot.sound"
-  ]
+  "solution_module": "SolutionFC",
+  "theorem_names": ["FC.erdos_449"],
+  "permitted_axioms": ["propext", "Classical.choice", "Quot.sound"]
 }

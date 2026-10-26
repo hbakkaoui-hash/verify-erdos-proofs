@@ -1,6 +1,6 @@
 name = "Erdos449Comparator"
 version = "0.1.0"
-defaultTargets = ["Challenge", "ChallengeFC", "Solution"]
+defaultTargets = ["Challenge", "ChallengeFC", "Solution", "SolutionFC"]
 
 [[require]]
 name = "mathlib"
@@ -25,8 +25,16 @@ roots = ["Challenge"]
 
 # L'enonce de la pull request formal-conjectures#5210.
 [[lean_lib]]
+name = "FCDefs"
+roots = ["FCDefs"]
+
+[[lean_lib]]
 name = "ChallengeFC"
 roots = ["ChallengeFC"]
+
+[[lean_lib]]
+name = "SolutionFC"
+roots = ["SolutionFC"]
 
 [[lean_lib]]
 name = "Solution"
